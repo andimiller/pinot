@@ -20,6 +20,7 @@ package org.apache.pinot.core.common;
 
 import com.clearspring.analytics.stream.cardinality.HyperLogLog;
 import com.clearspring.analytics.stream.cardinality.RegisterSet;
+import com.dynatrace.hash4j.distinctcount.UltraLogLog;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
@@ -134,7 +135,8 @@ public class ObjectSerDeUtils {
     PinotFourthMoment(34),
     ArgMinMaxObject(35),
     KllDataSketch(36),
-    IntegerTupleSketch(37);
+    IntegerTupleSketch(37),
+    UltraLogLog(38);
 
     private final int _value;
 
@@ -226,6 +228,8 @@ public class ObjectSerDeUtils {
         return ObjectType.IntegerTupleSketch;
       } else if (value instanceof ArgMinMaxObject) {
         return ObjectType.ArgMinMaxObject;
+      } else if (value instanceof UltraLogLog) {
+        return ObjectType.UltraLogLog;
       } else {
         throw new IllegalArgumentException("Unsupported type of value: " + value.getClass().getSimpleName());
       }
@@ -515,6 +519,23 @@ public class ObjectSerDeUtils {
     @Override
     public PinotFourthMoment deserialize(ByteBuffer byteBuffer) {
       return PinotFourthMoment.fromBytes(byteBuffer);
+    }
+  };
+
+  public static final ObjectSerDe<UltraLogLog> ULTRA_LOG_LOG_OBJECT_SER_DE = new ObjectSerDe<UltraLogLog>() {
+    @Override
+    public byte[] serialize(UltraLogLog value) {
+      return value.getState().clone();
+    }
+
+    @Override
+    public UltraLogLog deserialize(byte[] bytes) {
+      return UltraLogLog.wrap(bytes);
+    }
+
+    @Override
+    public UltraLogLog deserialize(ByteBuffer byteBuffer) {
+      return UltraLogLog.wrap(byteBuffer.array());
     }
   };
 
@@ -1326,6 +1347,7 @@ public class ObjectSerDeUtils {
       ARG_MIN_MAX_OBJECT_SER_DE,
       KLL_SKETCH_SER_DE,
       DATA_SKETCH_INT_TUPLE_SER_DE,
+      ULTRA_LOG_LOG_OBJECT_SER_DE
   };
   //@formatter:on
 

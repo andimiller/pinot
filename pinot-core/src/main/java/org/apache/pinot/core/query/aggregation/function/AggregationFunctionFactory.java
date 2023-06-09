@@ -278,6 +278,8 @@ public class AggregationFunctionFactory {
             return new DistinctCountThetaSketchAggregationFunction(arguments);
           case DISTINCTCOUNTRAWTHETASKETCH:
             return new DistinctCountRawThetaSketchAggregationFunction(arguments);
+          case DISTINCTCOUNTULL:
+              return new DistinctCountULLAggregationFunction(arguments);
           case DISTINCTSUM:
             return new DistinctSumAggregationFunction(firstArgument);
           case DISTINCTAVG:

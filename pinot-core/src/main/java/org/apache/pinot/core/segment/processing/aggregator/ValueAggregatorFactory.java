@@ -44,6 +44,9 @@ public class ValueAggregatorFactory {
       case DISTINCTCOUNTHLL:
       case DISTINCTCOUNTRAWHLL:
         return new DistinctCountHLLAggregator();
+      case DISTINCTCOUNTULL:
+      case DISTINCTCOUNTRAWULL:
+        return new DistinctCountULLAggregator();
       case DISTINCTCOUNTTHETASKETCH:
       case DISTINCTCOUNTRAWTHETASKETCH:
         return new DistinctCountThetaSketchAggregator();

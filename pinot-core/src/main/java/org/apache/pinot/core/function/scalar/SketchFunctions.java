@@ -19,6 +19,11 @@
 package org.apache.pinot.core.function.scalar;
 
 import com.clearspring.analytics.stream.cardinality.HyperLogLog;
+import com.dynatrace.hash4j.distinctcount.UltraLogLog;
+import com.dynatrace.hash4j.hashing.HashFunnel;
+import com.dynatrace.hash4j.hashing.Hasher64;
+import com.dynatrace.hash4j.hashing.Hashing;
+import it.unimi.dsi.fastutil.Hash;
 import java.math.BigDecimal;
 import javax.annotation.Nullable;
 import org.apache.datasketches.theta.Sketches;
@@ -136,6 +141,49 @@ public class SketchFunctions {
       hll.offer(input);
     }
     return ObjectSerDeUtils.HYPER_LOG_LOG_SER_DE.serialize(hll);
+  }
+
+  /**
+   * Create an UltraLogLog containing the input
+   *
+   * @param input an Object we want to insert into the ULL, may be null to return an empty ULL
+   * @return serialized ULL as bytes
+   */
+  @ScalarFunction(nullableParameters = true)
+  public static byte[] toULL(@Nullable Object input) {
+    return toULL(input, CommonConstants.Helix.DEFAULT_HYPERLOGLOG_LOG2M);
+  }
+
+  /**
+   * Create an UltraLogLog containing the input, with a configurable log2m
+   *
+   * @param input an Object we want to insert into the ULL, may be null to return an empty ULL
+   * @param log2m the log2m value for the created UltraLogLog
+   * @return serialized ULL as bytes
+   */
+  @ScalarFunction(nullableParameters = true)
+  public static byte[] toULL(@Nullable Object input, int log2m) {
+    UltraLogLog ull = UltraLogLog.create(log2m);
+    if (input != null) {
+      if (input instanceof Integer) {
+        ull.add(Hashing.wyhashFinal4().hashStream().putInt((Integer) input).getAsLong());
+      } else if (input instanceof Long) {
+        ull.add(Hashing.wyhashFinal4().hashStream().putLong((Long) input).getAsLong());
+      } else if (input instanceof Float) {
+        ull.add(Hashing.wyhashFinal4().hashStream().putFloat((Float) input).getAsLong());
+      } else if (input instanceof Double) {
+        ull.add(Hashing.wyhashFinal4().hashStream().putDouble((Double) input).getAsLong());
+      } else if (input instanceof BigDecimal) {
+        ull.add(Hashing.wyhashFinal4().hashStream().putString(((BigDecimal) input).toString()).getAsLong());
+      } else if (input instanceof String) {
+        ull.add(Hashing.wyhashFinal4().hashStream().putString((String) input).getAsLong());
+      } else if (input instanceof byte[]) {
+        ull.add(Hashing.wyhashFinal4().hashStream().putBytes((byte[]) input).getAsLong());
+      } else {
+        throw new IllegalArgumentException("Unrecognised input type for ULL: " + input.getClass().getName());
+      }
+    }
+    return ObjectSerDeUtils.ULTRA_LOG_LOG_OBJECT_SER_DE.serialize(ull);
   }
 
   /**
