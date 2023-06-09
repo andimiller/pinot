@@ -20,10 +20,7 @@ package org.apache.pinot.core.function.scalar;
 
 import com.clearspring.analytics.stream.cardinality.HyperLogLog;
 import com.dynatrace.hash4j.distinctcount.UltraLogLog;
-import com.dynatrace.hash4j.hashing.HashFunnel;
-import com.dynatrace.hash4j.hashing.Hasher64;
 import com.dynatrace.hash4j.hashing.Hashing;
-import it.unimi.dsi.fastutil.Hash;
 import java.math.BigDecimal;
 import javax.annotation.Nullable;
 import org.apache.datasketches.theta.Sketches;
