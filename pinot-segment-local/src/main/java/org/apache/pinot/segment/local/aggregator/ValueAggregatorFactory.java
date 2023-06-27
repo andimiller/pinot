@@ -72,6 +72,8 @@ public class ValueAggregatorFactory {
       case AVGVALUEINTEGERSUMTUPLESKETCH:
       case SUMVALUESINTEGERSUMTUPLESKETCH:
         return new IntegerTupleSketchValueAggregator(IntegerSummary.Mode.Sum);
+      case DISTINCTCOUNTULL:
+        return new DistinctCountULLValueAggregator();
       default:
         throw new IllegalStateException("Unsupported aggregation type: " + aggregationType);
     }
@@ -118,6 +120,8 @@ public class ValueAggregatorFactory {
       case AVGVALUEINTEGERSUMTUPLESKETCH:
       case SUMVALUESINTEGERSUMTUPLESKETCH:
         return IntegerTupleSketchValueAggregator.AGGREGATED_VALUE_TYPE;
+      case DISTINCTCOUNTULL:
+        return DistinctCountULLValueAggregator.AGGREGATED_VALUE_TYPE;
       default:
         throw new IllegalStateException("Unsupported aggregation type: " + aggregationType);
     }

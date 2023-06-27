@@ -54,7 +54,6 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -526,8 +525,8 @@ public class ObjectSerDeUtils {
   public static final ObjectSerDe<UltraLogLog> ULTRA_LOG_LOG_OBJECT_SER_DE = new ObjectSerDe<UltraLogLog>() {
     @Override
     public byte[] serialize(UltraLogLog value) {
-      ByteBuffer buff = ByteBuffer.allocate(4 + value.getState().length);
-      buff.putInt(value.getP());
+      ByteBuffer buff = ByteBuffer.allocate(1 + value.getState().length);
+      buff.put((byte) value.getP());
       buff.put(value.getState());
       return buff.array();
     }
@@ -540,7 +539,7 @@ public class ObjectSerDeUtils {
 
     @Override
     public UltraLogLog deserialize(ByteBuffer byteBuffer) {
-      int p = byteBuffer.getInt();
+      int p = byteBuffer.get();
       byte[] state = new byte[1 << p];
       byteBuffer.get(state);
       return UltraLogLog.wrap(state);

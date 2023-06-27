@@ -42,10 +42,10 @@ import org.roaringbitmap.PeekableIntIterator;
 import org.roaringbitmap.RoaringBitmap;
 
 
-public class DistinctCountULLAggregationFunction extends BaseSingleInputAggregationFunction<UltraLogLog, Double> {
+public class DistinctCountULLAggregationFunction extends BaseSingleInputAggregationFunction<UltraLogLog, Comparable> {
   protected final int _log2m;
 
-  protected static Optional<Long> wyHashObject(Object input) {
+  public static Optional<Long> wyHashObject(Object input) {
     if (input != null) {
       HashStream64 hs = Hashing.wyhashFinal4().hashStream();
       if (input instanceof Integer) {
@@ -378,7 +378,7 @@ public class DistinctCountULLAggregationFunction extends BaseSingleInputAggregat
   }
 
   @Override
-  public Double extractFinalResult(UltraLogLog intermediateResult) {
+  public Comparable extractFinalResult(UltraLogLog intermediateResult) {
     return intermediateResult.getDistinctCountEstimate();
   }
 

@@ -19,6 +19,7 @@
 package org.apache.pinot.segment.local.utils;
 
 import com.clearspring.analytics.stream.cardinality.HyperLogLog;
+import com.dynatrace.hash4j.distinctcount.UltraLogLog;
 import com.google.common.primitives.Longs;
 import com.tdunning.math.stats.MergingDigest;
 import com.tdunning.math.stats.TDigest;
@@ -185,6 +186,30 @@ public class CustomSerDeUtils {
       } catch (IOException e) {
         throw new RuntimeException("Caught exception while de-serializing HyperLogLog", e);
       }
+    }
+  };
+
+  public static final ObjectSerDe<UltraLogLog> ULTRA_LOG_LOG_OBJECT_SER_DE = new ObjectSerDe<UltraLogLog>() {
+    @Override
+    public byte[] serialize(UltraLogLog value) {
+      ByteBuffer buff = ByteBuffer.allocate(1 + value.getState().length);
+      buff.put((byte) value.getP());
+      buff.put(value.getState());
+      return buff.array();
+    }
+
+    @Override
+    public UltraLogLog deserialize(byte[] bytes) {
+      ByteBuffer buff = ByteBuffer.wrap(bytes);
+      return deserialize(buff);
+    }
+
+    @Override
+    public UltraLogLog deserialize(ByteBuffer byteBuffer) {
+      int p = byteBuffer.get();
+      byte[] state = new byte[1 << p];
+      byteBuffer.get(state);
+      return UltraLogLog.wrap(state);
     }
   };
 
