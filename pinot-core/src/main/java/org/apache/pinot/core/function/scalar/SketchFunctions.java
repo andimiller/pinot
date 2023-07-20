@@ -68,6 +68,16 @@ public class SketchFunctions {
   private SketchFunctions() {
   }
 
+  @ScalarFunction(nullableParameters = true)
+  public static Object coalesce(@Nullable Object... values) {
+    for (Object value : values) {
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
+
   /**
    * Create a Theta Sketch containing the input
    *
